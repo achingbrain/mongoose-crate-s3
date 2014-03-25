@@ -1,0 +1,30 @@
+{
+  "author": "Alex Potsides",
+  "name": "mongoose-crate-s3",
+  "description": "mongoose-crate StorageProvider that uploads files to Amazon S3",
+  "keywords": ["mongoose", "crate", "s3", "uploads", "attachments", "files"],
+  "version": "0.0.1",
+  "homepage": "https://github.com/achingbrain/mongoose-crate-s3",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/achingbrain/mongoose-crate-s3.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha",
+    "coveralls": "istanbul cover _mocha && cat ./coverage/lcov.info | coveralls"
+  },
+  "dependencies": {
+    "mongoose-crate": "git://github.com/achingbrain/mongoose-crate.git",
+    "async": "^0.2",
+    "knox": "^0.8"
+  },
+  "devDependencies": {
+    "mocha": "^1.18",
+    "should": "^3.2",
+    "mongoose": "^3.8",
+    "istanbul": "^0.2",
+    "sinon": "^1.9",
+    "coveralls": "^2.8"
+  }
+}

@@ -21,7 +21,8 @@ PostSchema.plugin(crate, {
     key: "<api-key-here>",
     secret: "<secret-here>",
     bucket: "<bucket-here>",
-    acl: "<acl-here>" // defaults to public-read
+    acl: "<acl-here>", // defaults to public-read
+    region: "<region-here>", // defaults to us-standard
   }),
   fields: {
     file: {}
@@ -40,3 +41,9 @@ post.attach("image", {path: "/path/to/image"}, function(error) {
 	// post.file.url
 });
 ```
+
+## Regions
+
+By default the region is assumed to be `us-standard`.  The region is used to assemble the endpoint so please specify a different one if you are hosting in Europe, for example.
+
+A full list of valid S3 regions is available from the [AWS documentation website](http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region).

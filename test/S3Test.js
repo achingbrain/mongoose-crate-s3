@@ -114,7 +114,7 @@ describe("S3", function() {
 
 		async.waterfall([function(callback) {
 			// save the file
-			s3.save(sourceFile, callback);
+			s3.save({path: sourceFile}, callback);
 		}, function(url, callback) {
 			s3Url = url;
 

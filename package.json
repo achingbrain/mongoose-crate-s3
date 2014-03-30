@@ -3,7 +3,7 @@
   "name": "mongoose-crate-s3",
   "description": "mongoose-crate StorageProvider that uploads files to Amazon S3",
   "keywords": ["mongoose", "crate", "s3", "uploads", "attachments", "files"],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/achingbrain/mongoose-crate-s3",
   "repository": {
     "type": "git",
@@ -26,6 +26,6 @@
     "sinon": "^1.9",
     "coveralls": "^2.8",
     "request": "^2.34",
-    "async": "^0.2"
+    "async": "^0.4"
   }
 }

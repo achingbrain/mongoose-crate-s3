@@ -8,38 +8,38 @@ A StorageProvider for mongoose-crate that stores files in Amazon S3 buckets
 
 ```javascript
 var mongoose = require('mongoose'),
-  crate = require("mongoose-crate"),
-  S3 = require("mongoose-crate-s3");
+  crate = require('mongoose-crate'),
+  S3 = require('mongoose-crate-s3')
 
 var PostSchema = new mongoose.Schema({
   title: String,
   description: String
-});
+})
 
 PostSchema.plugin(crate, {
   storage: new S3({
-    key: "<api-key-here>",
-    secret: "<secret-here>",
-    bucket: "<bucket-here>",
-    acl: "<acl-here>", // defaults to public-read
-    region: "<region-here>" // defaults to us-standard
+    key: '<api-key-here>',
+    secret: '<secret-here>',
+    bucket: '<bucket-here>',
+    acl: '<acl-here>', // defaults to public-read
+    region: '<region-here>' // defaults to us-standard
   }),
   fields: {
     file: {}
   }
-});
+})
 
-var Post = mongoose.model('Post', PostSchema);
+var Post = mongoose.model('Post', PostSchema)
 ```
 
 .. then later:
 
 ```javascript
-var post = new Post();
-post.attach("image", {path: "/path/to/image"}, function(error) {
-	// file is now uploaded and post.file is populated e.g.:
-	// post.file.url
-});
+var post = new Post()
+post.attach('image', {path: '/path/to/image'}, function(error) {
+  // file is now uploaded and post.file is populated e.g.:
+  // post.file.url
+})
 ```
 
 ## Regions

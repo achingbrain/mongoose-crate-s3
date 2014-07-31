@@ -26,6 +26,7 @@
     "sinon": "^1.9",
     "coveralls": "^2.8",
     "request": "^2.34",
-    "async": "^0.9"
+    "async": "^0.9",
+    "proxyquire": "^1.0"
   }
 }

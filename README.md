@@ -22,7 +22,10 @@ PostSchema.plugin(crate, {
     secret: '<secret-here>',
     bucket: '<bucket-here>',
     acl: '<acl-here>', // defaults to public-read
-    region: '<region-here>' // defaults to us-standard
+    region: '<region-here>', // defaults to us-standard
+    path: function(attachment) { // where the file is stored in the bucket - defaults to this function
+      return return '/' + path.basename(attachment.path)
+    }
   }),
   fields: {
     file: {}

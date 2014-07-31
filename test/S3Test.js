@@ -5,7 +5,9 @@ var should = require('should'),
   path = require('path'),
   request = require('request'),
   async = require('async'),
-  S3 = require('../lib/S3')
+  S3 = require('../lib/S3'),
+  sinon = require('sinon'),
+  proxyquire = require('proxyquire')
 
 describe('S3', function() {
 
@@ -137,6 +139,145 @@ describe('S3', function() {
       callback()
     }], function(error) {
       should(error).not.ok
+
+      done()
+    })
+  })
+
+  it('should allow overriding storage path', function(done) {
+    var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
+
+    var uploadPath = 'hello'
+
+    var client = {
+      putFile: sinon.stub()
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: function () {
+          return client
+        }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE',
+      path: function (attachment) {
+        should(attachment).be.ok
+
+        return uploadPath
+      }
+    })
+
+    var storagePath = 'foo'
+
+    client.putFile.callsArgWith(3, null, {req: {url: storagePath}})
+
+    s3.save({path: sourceFile}, function(error, storedAt) {
+      storagePath.should.equal(storedAt)
+
+      client.putFile.getCall(0).args[1].should.equal(uploadPath)
+
+      done()
+    })
+  })
+
+  it('should support default storage path', function(done) {
+    var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
+
+    var client = {
+      putFile: sinon.stub()
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: function () {
+          return client
+        }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE'
+    })
+
+    var storagePath = 'foo'
+
+    client.putFile.callsArgWith(3, null, {req: {url: storagePath}})
+
+    s3.save({path: sourceFile}, function(error, storedAt) {
+      storagePath.should.equal(storedAt)
+
+      client.putFile.getCall(0).args[1].should.equal('/node_js_logo.png')
+
+      done()
+    })
+  })
+
+  it('should remove a file', function(done) {
+    var client = {
+      deleteFile: sinon.stub()
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: function () {
+          return client
+        }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE'
+    })
+
+    client.deleteFile.callsArg(1)
+
+    s3.remove({
+      url: 'foo'
+    }, function() {
+      client.deleteFile.getCall(0).args[0].should.equal('foo')
+
+      done()
+    })
+  })
+
+  it('should not remove a file with no URL', function(done) {
+    var client = {
+      deleteFile: sinon.stub()
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: function () {
+          return client
+        }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE'
+    })
+
+    client.deleteFile.callsArg(1)
+
+    s3.remove({
+      url: null
+    }, function() {
+      client.deleteFile.callCount.should.equal(0)
 
       done()
     })

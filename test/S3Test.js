@@ -9,6 +9,11 @@ var should = require('should'),
   sinon = require('sinon'),
   proxyquire = require('proxyquire')
 
+var bucket =  process.env.CRATE_BUCKET
+var key = process.env.CRATE_KEY
+var secret = process.env.CRATE_SECRET
+var region = process.env.CRATE_REGION
+
 describe('S3', function() {
 
   it('should require options', function(done) {
@@ -96,14 +101,6 @@ describe('S3', function() {
 
   it('should store and remove a file', function(done) {
     var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
-
-    // if you want to run this test, remove the next line and add your S3 details below
-    return done()
-
-    var bucket =  'PUT_YOUR_BUCKET_HERE'
-    var key = 'PUT_YOUR_KEY_HERE'
-    var secret = 'PUT_YOUR_BUCKET_HERE'
-    var region = 'PUT_YOUR_REGION_HERE'
 
     var s3 = new S3({
       key: key,

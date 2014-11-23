@@ -100,6 +100,9 @@ describe('S3', function() {
   })
 
   it('should store and remove a file', function(done) {
+    // network operations are slow
+    this.timeout(10000)
+
     var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
 
     var s3 = new S3({

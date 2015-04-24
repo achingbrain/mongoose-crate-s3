@@ -99,7 +99,7 @@ describe('S3', function() {
     done()
   })
 
-  it('should store and remove a file', function(done) {
+  it.skip('should store and remove a file', function(done) {
     // network operations are slow
     this.timeout(10000)
 

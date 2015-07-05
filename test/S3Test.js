@@ -282,4 +282,57 @@ describe('S3', function() {
       done()
     })
   })
+
+  it('should check the statusCode of the response', function (done) {
+    var client = {
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+          createClient: function () {
+              return client
+          }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+        secret: 'PUT_YOUR_BUCKET_HERE',
+        bucket: 'PUT_YOUR_BUCKET_HERE',
+        region: 'PUT_YOUR_REGION_HERE',
+        path: function (attachment) {
+        should(attachment).be.ok
+
+          return uploadPath
+        }
+    })
+
+    var ret;
+    ret = s3._queryResult(true, null, function(data){return data} )
+    ret.should.equal(true)
+
+    var res = {on : function(){}, statusCode : 200, req : { url : 'fakeurl'}}
+    ret = s3._queryResult(false, res, function(error, data){return data} )
+    ret.should.equal('fakeurl')
+
+    var err = new Error();
+    err.statusCode = 300;
+    err.body = 'mouse';
+
+    res = {
+      on : function(type, chunkfunc){ 
+      if ('data' === type ){
+        chunkfunc('mouse');
+      } else {
+        ret = chunkfunc()
+      }
+      },
+      statusCode : 300,
+    }
+    s3._queryResult(false, res, function(error){ return error} )
+
+    ret.should.eql(err)
+
+    done()
+})
 })

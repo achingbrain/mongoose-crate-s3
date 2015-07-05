@@ -18,7 +18,10 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover ./node_modules/mocha/bin/_mocha",
+    "lint": "standard",
+    "test": "mocha",
+    "test:coverage": "istanbul --include-all-sources cover _mocha",
+    "test:coverage:check": "istanbul --include-all-sources cover _mocha && istanbul check-coverage --statement 100 --branch 100 --function 100",
     "coveralls": "istanbul cover _mocha && cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
@@ -27,27 +30,30 @@
   },
   "devDependencies": {
     "async": "^0.9",
+    "chai": "^3.0.0",
     "coveralls": "^2.8",
     "istanbul": "^0.3",
     "mocha": "^2.2.4",
     "mongoose": "^4.0.2",
+    "pre-commit": "^1.0.10",
     "proxyquire": "^1.0",
     "request": "^2.34",
     "should": "^6.0.1",
-    "sinon": "^1.9"
+    "sinon": "^1.9",
+    "standard": "^4.5.2"
   },
-  "jshintConfig": {
-    "asi": true,
-    "browser": false,
-    "browserify": true,
-    "curly": false,
-    "expr": true,
-    "indent": 2,
-    "loopfunc": true,
-    "node": true,
-    "trailing": true,
-    "undef": true,
-    "white": true,
-    "mocha": true
-  }
+  "standard": {
+    "global": [
+      "describe",
+      "it",
+      "before",
+      "after",
+      "beforeAll",
+      "afterAll"
+    ]
+  },
+  "pre-commit": [
+    "test:coverage:check",
+    "lint"
+  ]
 }

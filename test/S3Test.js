@@ -1,105 +1,86 @@
-var should = require('should'),
-  crypto = require('crypto'),
-  os = require('os'),
-  fs = require('fs'),
-  path = require('path'),
-  request = require('request'),
-  async = require('async'),
-  S3 = require('../lib/S3'),
-  sinon = require('sinon'),
-  proxyquire = require('proxyquire')
+var expect = require('chai').expect
+var path = require('path')
+var request = require('request')
+var async = require('async')
+var S3 = require('../lib/S3')
+var sinon = require('sinon')
+var proxyquire = require('proxyquire')
 
-var bucket =  process.env.CRATE_BUCKET
+var bucket = process.env.CRATE_BUCKET
 var key = process.env.CRATE_KEY
 var secret = process.env.CRATE_SECRET
 var region = process.env.CRATE_REGION
 
-describe('S3', function() {
+describe('S3', function () {
 
-  it('should require options', function(done) {
-    (function() {
-      new S3()
-    }).should.throw()
-
-    done()
+  it('should require options', function () {
+    expect(function () {
+      return new S3()
+    }).to.throw
   })
 
-  it('should require a key', function(done) {
-    (function() {
-      new S3({})
-    }).should.throw()
-
-    done()
+  it('should require a key', function () {
+    expect(function () {
+      return new S3({})
+    }).to.throw
   })
 
-  it('should require a secret', function(done) {
-    (function() {
-      new S3({
+  it('should require a secret', function () {
+    expect(function () {
+      return new S3({
         key: 'foo'
       })
-    }).should.throw()
-
-    done()
+    }).to.throw
   })
 
-  it('should require a bucket', function(done) {
-    (function() {
-      new S3({
+  it('should require a bucket', function () {
+    expect(function () {
+      return new S3({
         key: 'foo',
         secret: 'bar'
       })
-    }).should.throw()
-
-    done()
+    }).to.throw
   })
 
-  it('should set a default acl', function(done) {
+  it('should set a default acl', function () {
     var s3 = new S3({
       key: 'foo',
       secret: 'bar',
       bucket: 'baz'
     })
-    s3._options.acl.should.not.be.null
-
-    done()
+    expect(s3._options.acl).to.be.ok
   })
 
-  it('should accept an acl', function(done) {
+  it('should accept an acl', function () {
     var s3 = new S3({
       key: 'foo',
       secret: 'bar',
       bucket: 'baz',
       acl: 'qux'
     })
-    s3._options.acl.should.equal('qux')
-
-    done()
+    expect(s3._options.acl).to.equal('qux')
   })
 
-  it('should set a default region', function(done) {
+  it('should set a default region', function () {
     var s3 = new S3({
       key: 'foo',
       secret: 'bar',
       bucket: 'baz'
     })
-    s3._options.region.should.not.be.null
-
-    done()
+    expect(s3._options.region).to.be.ok
   })
 
-  it('should accept a region', function(done) {
+  it('should accept a region', function () {
     var s3 = new S3({
       key: 'foo',
       secret: 'bar',
       bucket: 'baz',
       region: 'qux'
     })
-    s3._options.region.should.equal('qux')
-
-    done()
+    expect(s3._options.region).to.equal('qux')
   })
 
-  it.skip('should store and remove a file', function(done) {
+  it.skip('should store and remove a file', function (done) {
     // network operations are slow
     this.timeout(10000)
 
@@ -114,37 +95,37 @@ describe('S3', function() {
 
     var s3Url
 
-    async.waterfall([function(callback) {
+    async.waterfall([function (callback) {
       // save the file
       s3.save({path: sourceFile}, callback)
-    }, function(url, callback) {
+    }, function (url, callback) {
       s3Url = url
 
       // make sure it was uploaded
       request.head(url, callback)
-    }, function(response, body, callback) {
+    }, function (response, body, callback) {
       // resource should exist
-      response.statusCode.should.equal(200)
+      expect(response.statusCode).to.equal(200)
 
       // remove the file
       s3.remove({url: s3Url}, callback)
-    }, function(message, callback) {
+    }, function (message, callback) {
       // make sure it's not there any more
       request.head(s3Url, callback)
-    }, function(response, body, callback) {
+    }, function (response, body, callback) {
       // resource should exist
       response.statusCode.should.not.equal(200)
 
       // all done
       callback()
-    }], function(error) {
-      should(error).not.ok
+    }], function (error) {
+      expect(error).to.not.exist
 
       done()
     })
   })
 
-  it('should allow overriding storage path', function(done) {
+  it('should allow overriding storage path', function (done) {
     var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
 
     var uploadPath = 'hello'
@@ -167,7 +148,7 @@ describe('S3', function() {
       bucket: 'PUT_YOUR_BUCKET_HERE',
       region: 'PUT_YOUR_REGION_HERE',
       path: function (attachment) {
-        should(attachment).be.ok
+        expect(attachment).to.be.ok
 
         return uploadPath
       }
@@ -177,16 +158,16 @@ describe('S3', function() {
 
     client.putFile.callsArgWith(3, null, {req: {url: storagePath}})
 
-    s3.save({path: sourceFile}, function(error, storedAt) {
-      storagePath.should.equal(storedAt)
-
-      client.putFile.getCall(0).args[1].should.equal(uploadPath)
+    s3.save({path: sourceFile}, function (error, storedAt) {
+      expect(error).to.not.exist
+      expect(storagePath).to.equal(storedAt)
+      expect(client.putFile.getCall(0).args[1]).to.equal(uploadPath)
 
       done()
     })
   })
 
-  it('should support default storage path', function(done) {
+  it('should support default storage path', function (done) {
     var sourceFile = path.resolve(__dirname + '/./fixtures/node_js_logo.png')
 
     var client = {
@@ -212,16 +193,16 @@ describe('S3', function() {
 
     client.putFile.callsArgWith(3, null, {req: {url: storagePath}})
 
-    s3.save({path: sourceFile}, function(error, storedAt) {
-      storagePath.should.equal(storedAt)
-
-      client.putFile.getCall(0).args[1].should.equal('/node_js_logo.png')
+    s3.save({path: sourceFile}, function (error, storedAt) {
+      expect(error).to.not.exist
+      expect(storagePath).to.equal(storedAt)
+      expect(client.putFile.getCall(0).args[1]).to.equal('/node_js_logo.png')
 
       done()
     })
   })
 
-  it('should remove a file', function(done) {
+  it('should remove a file', function (done) {
     var client = {
       deleteFile: sinon.stub()
     }
@@ -245,14 +226,14 @@ describe('S3', function() {
 
     s3.remove({
       url: 'foo'
-    }, function() {
-      client.deleteFile.getCall(0).args[0].should.equal('foo')
+    }, function () {
+      expect(client.deleteFile.getCall(0).args[0]).to.equal('foo')
 
       done()
     })
   })
 
-  it('should not remove a file with no URL', function(done) {
+  it('should not remove a file with no URL', function (done) {
     var client = {
       deleteFile: sinon.stub()
     }
@@ -276,63 +257,67 @@ describe('S3', function() {
 
     s3.remove({
       url: null
-    }, function() {
-      client.deleteFile.callCount.should.equal(0)
+    }, function () {
+      expect(client.deleteFile.callCount).to.equal(0)
 
       done()
     })
   })
 
   it('should check the statusCode of the response', function (done) {
-    var client = {
-    }
-
     var S3 = proxyquire('../lib/S3', {
       'knox': {
-          createClient: function () {
-              return client
-          }
+        createClient: function () {
+          return {}
+        }
       }
     })
 
     var s3 = new S3({
       key: 'PUT_YOUR_KEY_HERE',
-        secret: 'PUT_YOUR_BUCKET_HERE',
-        bucket: 'PUT_YOUR_BUCKET_HERE',
-        region: 'PUT_YOUR_REGION_HERE',
-        path: function (attachment) {
-        should(attachment).be.ok
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE',
+      path: function (attachment) {
+        expect(attachment).to.be.ok
 
-          return uploadPath
-        }
+        return attachment
+      }
     })
 
-    var ret;
-    ret = s3._queryResult(true, null, function(data){return data} )
-    ret.should.equal(true)
+    var ret
+    ret = s3._queryResult(true, null, sinon.stub().returnsArg(0))
+    expect(ret).to.be.true
 
-    var res = {on : function(){}, statusCode : 200, req : { url : 'fakeurl'}}
-    ret = s3._queryResult(false, res, function(error, data){return data} )
-    ret.should.equal('fakeurl')
+    var res = {
+      on: sinon.stub(),
+      statusCode: 200,
+      req: {
+        url: 'fakeurl'
+      }
+    }
+    ret = s3._queryResult(false, res, sinon.stub().returnsArg(1))
+    expect(ret).to.equal('fakeurl')
 
-    var err = new Error();
-    err.statusCode = 300;
-    err.body = 'mouse';
+    var err = new Error()
+    err.statusCode = 300
+    err.body = 'mouse'
 
     res = {
-      on : function(type, chunkfunc){ 
-      if ('data' === type ){
-        chunkfunc('mouse');
-      } else {
-        ret = chunkfunc()
-      }
+      on: function (type, chunkfunc) {
+        if (type === 'data') {
+          chunkfunc('mouse')
+        } else {
+          ret = chunkfunc()
+        }
       },
-      statusCode : 300,
+      statusCode: 300
     }
-    s3._queryResult(false, res, function(error){ return error} )
+    s3._queryResult(false, res, sinon.stub().returnsArg(0))
 
-    ret.should.eql(err)
+    expect(ret.statusCode).to.equal(err.statusCode)
+    expect(ret.body).to.equal(err.body)
 
     done()
-})
+  })
 })

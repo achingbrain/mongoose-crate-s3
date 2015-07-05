@@ -1,2 +1,2 @@
 
-module.exports = require("./lib/S3");
+module.exports = require('./lib/S3')

@@ -233,6 +233,37 @@ describe('S3', function () {
     })
   })
 
+  it('should remove a file with a long path', function (done) {
+    var client = {
+      deleteFile: sinon.stub()
+    }
+
+    var S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: function () {
+          return client
+        }
+      }
+    })
+
+    var s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE'
+    })
+
+    client.deleteFile.callsArg(1)
+
+    s3.remove({
+      url: 'http://example.com/foo/bar/baz.zip'
+    }, function () {
+      expect(client.deleteFile.getCall(0).args[0]).to.equal('/foo/bar/baz.zip')
+
+      done()
+    })
+  })
+
   it('should not remove a file with no URL', function (done) {
     var client = {
       deleteFile: sinon.stub()

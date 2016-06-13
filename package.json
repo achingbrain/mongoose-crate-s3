@@ -41,16 +41,6 @@
     "sinon": "^1.9",
     "standard": "^7.1.2"
   },
-  "standard": {
-    "global": [
-      "describe",
-      "it",
-      "before",
-      "after",
-      "beforeAll",
-      "afterAll"
-    ]
-  },
   "pre-commit": [
     "test:coverage:check",
     "lint"

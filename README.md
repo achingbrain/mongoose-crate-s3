@@ -39,7 +39,14 @@ const Post = mongoose.model('Post', PostSchema)
 
 ```javascript
 const post = new Post()
-post.attach('image', {path: '/path/to/image'}, (error) => {
+post.attach('image', {
+  path: '/path/to/image',
+
+  // optionally send these additional headers
+  headers: {
+    'Content-Type': 'image/png'
+  }
+}, (error) => {
   // file is now uploaded and post.file is populated e.g.:
   // post.file.url
 })

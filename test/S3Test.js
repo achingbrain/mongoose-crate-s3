@@ -162,6 +162,46 @@ describe('S3', () => {
     })
   })
 
+  it('should allow overriding request headers', (done) => {
+    const sourceFile = path.resolve(path.join(__dirname, '.', 'fixtures', 'node_js_logo.png'))
+
+    const client = {
+      putFile: sinon.stub()
+    }
+
+    const S3 = proxyquire('../lib/S3', {
+      'knox': {
+        createClient: () => {
+          return client
+        }
+      }
+    })
+
+    const s3 = new S3({
+      key: 'PUT_YOUR_KEY_HERE',
+      secret: 'PUT_YOUR_BUCKET_HERE',
+      bucket: 'PUT_YOUR_BUCKET_HERE',
+      region: 'PUT_YOUR_REGION_HERE'
+    })
+
+    const storagePath = 'foo'
+
+    client.putFile.callsArgWith(3, null, {req: {url: storagePath}})
+
+    s3.save({
+      path: sourceFile,
+      headers: {
+        foo: 'bar'
+      }
+    }, (error, storedAt) => {
+      expect(error).to.not.exist
+      expect(storagePath).to.equal(storedAt)
+      expect(client.putFile.getCall(0).args[2].foo).to.equal('bar')
+
+      done()
+    })
+  })
+
   it('should support default storage path', (done) => {
     const sourceFile = path.resolve(path.join(__dirname, '.', 'fixtures', 'node_js_logo.png'))
 
